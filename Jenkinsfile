@@ -60,8 +60,8 @@ pipeline {
 
         stage('Stop Cluster') {
             steps {
-                bat 'docker exec namenode stop-dfs.sh'
-                bat 'docker exec namenode stop-yarn.sh'
+                bat 'docker exec namenode bash -c "stop-dfs.sh" || exit 0'
+                bat 'docker exec namenode bash -c "stop-yarn.sh" || exit 0'
 
                 bat 'docker stop namenode datanode1 datanode2 datanode3'
             }
