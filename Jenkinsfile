@@ -14,17 +14,17 @@ pipeline {
         }
         stage('Prepare HDFS') {
             steps {
-                bat 'docker exec namenode hdfs dfs -rm -r -f /user/sales/output'
-                bat 'docker exec namenode hdfs dfsadmin -safemode leave'
-                bat 'docker exec namenode hdfs dfs -mkdir -p /user/sales/input'
+                bat 'docker exec namenode /opt/hadoop/bin/hdfs dfs -rm -r -f /user/sales/output'
+                bat 'docker exec namenode /opt/hadoop/bin/hdfs dfsadmin -safemode leave'
+                bat 'docker exec namenode /opt/hadoop/bin/hdfs dfs -mkdir -p /user/sales/input'
                 bat 'docker cp sales_dataset.csv namenode:/opt/results/sales_dataset.csv'
-                bat 'docker exec namenode hdfs dfs -put -f /opt/results/sales_dataset.csv /user/sales/input/'
+                bat 'docker exec namenode /opt/hadoop/bin/hdfs dfs -put -f /opt/results/sales_dataset.csv /user/sales/input/'
             }
         }
         stage('Run MapReduce') {
             steps {
-                bat 'docker exec namenode hadoop jar /opt/mapreduce/SalesAnalysis.jar SalesAnalysis /user/sales/input /user/sales/output/sales'
-                bat 'docker exec namenode hadoop jar /opt/mapreduce/StockAnalysis.jar StockAnalysis /user/sales/input /user/sales/output/stock'
+                bat 'docker exec namenode /opt/hadoop/bin/hadoop jar /opt/mapreduce/SalesAnalysis.jar SalesAnalysis /user/sales/input /user/sales/output/sales'
+                bat 'docker exec namenode /opt/hadoop/bin/hadoop jar /opt/mapreduce/StockAnalysis.jar StockAnalysis /user/sales/input /user/sales/output/stock'
             }
         }
         stage('Generate Reports') {
