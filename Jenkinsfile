@@ -12,8 +12,8 @@ pipeline {
                 bat 'docker exec datanode3 service ssh start'
                 bat 'docker exec namenode service ssh start'
 
-                bat 'docker exec namenode start-dfs.sh'
-                bat 'docker exec namenode start-yarn.sh'
+                bat 'docker exec namenode bash -c "start-dfs.sh"'
+                bat 'docker exec namenode bash -c "start-yarn.sh"'
             }
         }
 
