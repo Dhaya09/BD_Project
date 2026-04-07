@@ -14,7 +14,8 @@ pipeline {
         }
         stage('Prepare HDFS') {
             steps {
-                bat 'docker exec namenode /opt/hadoop/bin/hdfs dfsadmin -safemode wait'
+                bat 'ping -n 15 127.0.0.1 > nul'
+                bat 'docker exec namenode /opt/hadoop/bin/hdfs dfsadmin -safemode leave'
                 bat 'docker exec namenode /opt/hadoop/bin/hdfs dfs -rm -r -f /user/sales/output'
                 bat 'docker exec namenode /opt/hadoop/bin/hdfs dfs -mkdir -p /user/sales/input'
                 bat 'docker cp sales_dataset.csv namenode:/opt/results/sales_dataset.csv'
