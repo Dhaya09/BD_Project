@@ -18,7 +18,7 @@ pipeline {
                 bat 'docker exec namenode /opt/hadoop/bin/hdfs dfsadmin -safemode leave'
                 bat 'docker exec namenode /opt/hadoop/bin/hdfs dfs -rm -r -f /user/sales/output'
                 bat 'docker exec namenode /opt/hadoop/bin/hdfs dfs -mkdir -p /user/sales/input'
-                bat 'docker cp sales_dataset.csv namenode:/opt/results/sales_dataset.csv'
+                bat 'docker cp C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\sales_dataset.csv namenode:/opt/results/sales_dataset.csv'
                 bat 'docker exec namenode /opt/hadoop/bin/hdfs dfs -put -f /opt/results/sales_dataset.csv /user/sales/input/'
             }
         }
@@ -30,19 +30,14 @@ pipeline {
         }
         stage('Generate Reports') {
             steps {
-                // Download part files from HDFS to namenode local
                 bat 'docker exec namenode /opt/hadoop/bin/hdfs dfs -get -f /user/sales/output/sales/part-r-00000 /opt/results/sales_part0.txt'
                 bat 'docker exec namenode /opt/hadoop/bin/hdfs dfs -get -f /user/sales/output/sales/part-r-00001 /opt/results/sales_part1.txt'
                 bat 'docker exec namenode /opt/hadoop/bin/hdfs dfs -get -f /user/sales/output/sales/part-r-00002 /opt/results/sales_part2.txt'
                 bat 'docker exec namenode /opt/hadoop/bin/hdfs dfs -get -f /user/sales/output/stock/part-r-00000 /opt/results/stock_part0.txt'
                 bat 'docker exec namenode /opt/hadoop/bin/hdfs dfs -get -f /user/sales/output/stock/part-r-00001 /opt/results/stock_part1.txt'
                 bat 'docker exec namenode /opt/hadoop/bin/hdfs dfs -get -f /user/sales/output/stock/part-r-00002 /opt/results/stock_part2.txt'
-
-                // Merge all parts into final combined output
                 bat 'docker exec namenode bash -c "/opt/hadoop/bin/hdfs dfs -cat /user/sales/output/sales/part-r-* > /opt/results/sales_final.txt"'
                 bat 'docker exec namenode bash -c "/opt/hadoop/bin/hdfs dfs -cat /user/sales/output/stock/part-r-* > /opt/results/stock_final.txt"'
-
-                // Generate CSV, PDF and send email
                 bat 'docker exec namenode python3 /opt/results/generate_sales_stock_csv.py'
                 bat 'docker exec namenode python3 /opt/results/generate_sales_report.py'
                 bat 'docker exec namenode python3 /opt/results/send_sales_report.py'
@@ -51,20 +46,14 @@ pipeline {
         stage('Copy Results to Local') {
             steps {
                 bat 'mkdir C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results || exit 0'
-
-                // Final combined outputs
                 bat 'docker cp namenode:/opt/results/sales_final.txt C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\sales_final.txt'
                 bat 'docker cp namenode:/opt/results/stock_final.txt C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\stock_final.txt'
                 bat 'docker cp namenode:/opt/results/sales_analysis.csv C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\sales_analysis.csv'
                 bat 'docker cp namenode:/opt/results/stock_analysis.csv C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\stock_analysis.csv'
                 bat 'docker cp namenode:/opt/results/sales_report.pdf C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\sales_report.pdf'
-
-                // Sales part files
                 bat 'docker cp namenode:/opt/results/sales_part0.txt C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\sales_part0.txt'
                 bat 'docker cp namenode:/opt/results/sales_part1.txt C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\sales_part1.txt'
                 bat 'docker cp namenode:/opt/results/sales_part2.txt C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\sales_part2.txt'
-
-                // Stock part files
                 bat 'docker cp namenode:/opt/results/stock_part0.txt C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\stock_part0.txt'
                 bat 'docker cp namenode:/opt/results/stock_part1.txt C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\stock_part1.txt'
                 bat 'docker cp namenode:/opt/results/stock_part2.txt C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\stock_part2.txt'
