@@ -30,6 +30,19 @@ pipeline {
         }
         stage('Generate Reports') {
             steps {
+                // Download part files from HDFS to namenode local
+                bat 'docker exec namenode /opt/hadoop/bin/hdfs dfs -get -f /user/sales/output/sales/part-r-00000 /opt/results/sales_part0.txt'
+                bat 'docker exec namenode /opt/hadoop/bin/hdfs dfs -get -f /user/sales/output/sales/part-r-00001 /opt/results/sales_part1.txt'
+                bat 'docker exec namenode /opt/hadoop/bin/hdfs dfs -get -f /user/sales/output/sales/part-r-00002 /opt/results/sales_part2.txt'
+                bat 'docker exec namenode /opt/hadoop/bin/hdfs dfs -get -f /user/sales/output/stock/part-r-00000 /opt/results/stock_part0.txt'
+                bat 'docker exec namenode /opt/hadoop/bin/hdfs dfs -get -f /user/sales/output/stock/part-r-00001 /opt/results/stock_part1.txt'
+                bat 'docker exec namenode /opt/hadoop/bin/hdfs dfs -get -f /user/sales/output/stock/part-r-00002 /opt/results/stock_part2.txt'
+
+                // Merge all parts into final combined output
+                bat 'docker exec namenode bash -c "/opt/hadoop/bin/hdfs dfs -cat /user/sales/output/sales/part-r-* > /opt/results/sales_final.txt"'
+                bat 'docker exec namenode bash -c "/opt/hadoop/bin/hdfs dfs -cat /user/sales/output/stock/part-r-* > /opt/results/stock_final.txt"'
+
+                // Generate CSV, PDF and send email
                 bat 'docker exec namenode python3 /opt/results/generate_sales_stock_csv.py'
                 bat 'docker exec namenode python3 /opt/results/generate_sales_report.py'
                 bat 'docker exec namenode python3 /opt/results/send_sales_report.py'
