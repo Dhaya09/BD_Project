@@ -38,7 +38,11 @@ pipeline {
         stage('Copy Results to Local') {
             steps {
                 bat 'mkdir C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results || exit 0'
-                bat 'docker cp namenode:/opt/results/. C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\'
+                bat 'docker cp namenode:/opt/results/sales_final.txt C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\'
+                bat 'docker cp namenode:/opt/results/stock_final.txt C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\'
+                bat 'docker cp namenode:/opt/results/sales_analysis.csv C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\'
+                bat 'docker cp namenode:/opt/results/stock_analysis.csv C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\'
+                bat 'docker cp namenode:/opt/results/sales_report.pdf C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\'
             }
         }
         stage('Stop Cluster') {
