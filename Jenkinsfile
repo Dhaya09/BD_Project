@@ -38,11 +38,21 @@ pipeline {
         stage('Copy Results to Local') {
             steps {
                 bat 'mkdir C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results || exit 0'
+                bat 'mkdir C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\sales_output || exit 0'
+                bat 'mkdir C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\stock_output || exit 0'
+
+                // Final combined outputs
                 bat 'docker cp namenode:/opt/results/sales_final.txt C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\'
                 bat 'docker cp namenode:/opt/results/stock_final.txt C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\'
                 bat 'docker cp namenode:/opt/results/sales_analysis.csv C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\'
                 bat 'docker cp namenode:/opt/results/stock_analysis.csv C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\'
                 bat 'docker cp namenode:/opt/results/sales_report.pdf C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\'
+
+                // Raw MapReduce part files
+                bat 'docker exec namenode /opt/hadoop/bin/hdfs dfs -get -f /user/sales/output/sales /opt/results/sales_output'
+                bat 'docker exec namenode /opt/hadoop/bin/hdfs dfs -get -f /user/sales/output/stock /opt/results/stock_output'
+                bat 'docker cp namenode:/opt/results/sales_output C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\sales_output\\'
+                bat 'docker cp namenode:/opt/results/stock_output C:\\Users\\Dhayanidhi\\OneDrive\\Desktop\\BD_Dataset\\Results\\stock_output\\'
             }
         }
         stage('Stop Cluster') {
